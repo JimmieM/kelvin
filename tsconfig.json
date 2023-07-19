@@ -1,0 +1,16 @@
+{
+   "compilerOptions": {
+      "allowSyntheticDefaultImports": true,
+      "target": "ES2020",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "strict": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "resolveJsonModule": true
+   },
+   "include": ["src/**/*.ts", "src/transcribe/transcribe.command.ts"],
+   "exclude": ["node_modules"]
+}

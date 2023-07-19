@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+   <body>
+      <button onclick="startTranscribing()">Start transcribing</button>
+      <p id="transcript"></p>
+
+      <script>
+         var recognition = new webkitSpeechRecognition();
+         recognition.lang = 'en-US';
+         recognition.interimResults = false;
+
+         function startTranscribing() {
+            recognition.start();
+         }
+
+         recognition.onerror = function (event) {
+            console.error('Speech recognition error:', event.error);
+         };
+
+         recognition.onresult = function (event) {
+            var transcript = event.results[0][0].transcript;
+            document.getElementById('transcript').innerText = transcript;
+            fetch('/transcript', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({ transcript: transcript }),
+            });
+         };
+      </script>
+   </body>
+</html>
