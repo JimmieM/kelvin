@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import express from 'express';
-
+import { exec } from 'child_process';
 import open from 'open';
 import { runChatCompletion } from '../chat-gpt/chat-completion.js';
 import { convertTextToSpeech } from '../aws/polly/text-to-speech.js';
@@ -86,17 +86,43 @@ Your browser does not support the audio element.
 </html>
 `;
 
+const buildFrontend = () => {
+   return new Promise<void>((resolve, reject) => {
+      console.warn(rootDirectory);
+
+      exec(
+         'npm run build',
+         { cwd: path.join(rootDirectory, 'frontend') },
+         (error, stdout, stderr) => {
+            if (error) {
+               console.error(`exec error: ${error}`);
+               reject();
+               return;
+            }
+
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+
+            resolve();
+         },
+      );
+   });
+};
+
 transcribeCommand
    .description('Transcribes audio from the microphone')
    .action(async () => {
       // Create a new Express application
       const app = express();
 
+      await buildFrontend();
+
       const publicDirectory = path.join(rootDirectory, 'public');
 
       await mkDir(publicDirectory);
 
       app.use('/public', express.static(publicDirectory));
+      app.use(express.static(path.join(rootDirectory, 'frontend', 'dist')));
 
       // Middlewares for handling JSON body
       app.use(express.json());
@@ -106,7 +132,9 @@ transcribeCommand
 
       // Serve a static HTML file
       app.get('/', (req, res) => {
-         res.send(inlineHtml);
+         res.sendFile(
+            path.resolve(rootDirectory, 'frontend', 'dist', 'index.html'),
+         );
       });
 
       // Handle transcript POST requests

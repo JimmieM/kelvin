@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+   .scrollbar::-webkit-scrollbar,
+   .scrollbar-dark::-webkit-scrollbar,
+   .scrollbar-dark-gray::-webkit-scrollbar,
+   .scrollbar-white::-webkit-scrollbar {
+      padding-top: 10px;
+      width: 7px;
+      height: 7px;
+   }
+
+   .scrollbar::-webkit-scrollbar-track,
+   .scrollbar-dark::-webkit-scrollbar-track,
+   .scrollbar-dark-gray::-webkit-scrollbar-track,
+   .scrollbar-white::-webkit-scrollbar-track {
+      border-radius: 100vh;
+      background: transparent;
+   }
+
+   .scrollbar::-webkit-scrollbar-thumb {
+      border-radius: 100vh;
+      background-color: #f3f3f3;
+   }
+
+   .scrollbar-white::-webkit-scrollbar-thumb:hover {
+      background: #ebebeb;
+   }
+
+   .scrollbar-white::-webkit-scrollbar-thumb {
+      border-radius: 100vh;
+      background-color: white;
+   }
+
+   .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #ebebeb;
+   }
+
+   .scrollbar-dark::-webkit-scrollbar-thumb {
+      border-radius: 100vh;
+      background-color: #3b4958;
+   }
+
+   .scrollbar-dark::-webkit-scrollbar-thumb:hover {
+      background: #2e3945;
+   }
+
+   .scrollbar-dark-gray::-webkit-scrollbar-thumb {
+      border-radius: 100vh;
+      background-color: #3b4958;
+   }
+
+   .scrollbar-dark-gray::-webkit-scrollbar-thumb:hover {
+      background: #3b4958;
+   }
+}
