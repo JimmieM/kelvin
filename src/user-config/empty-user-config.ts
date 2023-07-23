@@ -10,7 +10,6 @@ export const emptyUserConfig: UserConfig = {
       region: '',
       config: {
          id: 'Joanna',
-         languageCode: 'en-US',
          textType: 'text',
          outputFormat: 'mp3',
       },
@@ -18,4 +17,12 @@ export const emptyUserConfig: UserConfig = {
    chatGPT: {
       key: '',
    },
+   languageCode: 'en-US',
+   wakeWords: ['mia', 'ey', 'wake up', 'help me'],
+   fileSearchDirs: [
+      {
+         words: ['home', 'hem'],
+         dirPath: '/Users/jim/Desktop',
+      },
+   ],
 };

@@ -5,27 +5,46 @@ import AWS from 'aws-sdk';
 import { loadConfig } from './user-config/user-config.js';
 import { Command } from 'commander';
 import { awsCommand } from './aws/aws.command.js';
-import { transcribeCommand } from './transcribe/transcribe.command.js';
+import { transcriptionInstance } from './transcribe/transcribe.js';
+import { configCommand } from './user-config/user-config.command.js';
+import path from 'path';
+import { rootDirectory } from './root/index.js';
+import { mkDir } from './fs-util/index.js';
 
-const config = loadConfig();
+async function main() {
+   await program.parseAsync(process.argv);
+}
 
-export const updateAwsConfig = (region?: string) => {
+const updateAwsConfig = (region?: string) => {
+   const config = loadConfig();
+
    AWS.config.update({
       ...config.aws,
       region: region ?? config.aws.region,
    });
 };
 
-updateAwsConfig();
+const setupOnBoot = async () => {
+   updateAwsConfig();
+
+   const publicDirectory = path.join(rootDirectory, 'public');
+   await mkDir(publicDirectory);
+};
+
+/**
+ * Begin setup
+ */
+
+await setupOnBoot();
 
 const program = new Command();
 
-program.addCommand(awsCommand);
-program.addCommand(transcribeCommand);
+program
+   .description('Transcribes audio from the microphone')
+   .action(transcriptionInstance);
 
-async function main() {
-   await program.parseAsync(process.argv);
-}
+program.addCommand(awsCommand);
+program.addCommand(configCommand);
 
 console.log(); // log a new line so there is a nice space
 await main();

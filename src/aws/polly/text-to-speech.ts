@@ -5,9 +5,9 @@ import * as util from 'util';
 import { v4 as uuidv4 } from 'uuid';
 import { loadConfig } from '../../user-config/user-config.js';
 import { UserConfig } from '../../user-config/user-config.model.js';
-const { Polly } = pkg;
-
 import { rootDirectory } from '../../root/index.js';
+
+const { Polly } = pkg;
 
 interface Options {
    id: string;
@@ -40,7 +40,7 @@ const getPollyParams = (
          options.textType ||
          defaultOptions.textType,
       LanguageCode:
-         config.aws.config?.languageCode ||
+         config.languageCode ||
          options.languageCode ||
          defaultOptions.languageCode,
    };

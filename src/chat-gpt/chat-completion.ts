@@ -1,16 +1,11 @@
-import { Configuration, OpenAIApi } from 'openai';
-import { loadConfig } from '../user-config/user-config.js';
-
-const config = loadConfig();
+import { OpenAIApi } from 'openai';
 
 export const runChatCompletion = async (
    text: string,
-   history: any[],
+   _history: any[],
+   openaiInstance: OpenAIApi,
 ): Promise<any[]> => {
-   const configuration = new Configuration({
-      apiKey: config.chatGPT.key,
-   });
-   const openai = new OpenAIApi(configuration);
+   const history = [..._history];
 
    const messages = [];
    for (const [input_text, completion_text] of history) {
@@ -21,7 +16,7 @@ export const runChatCompletion = async (
    messages.push({ role: 'user', content: text });
 
    try {
-      const completion = await openai.createChatCompletion({
+      const completion = await openaiInstance.createChatCompletion({
          model: 'gpt-3.5-turbo',
          messages: messages as any,
       });
