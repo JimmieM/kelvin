@@ -26,7 +26,9 @@ export const ChatPage = () => {
    const recognitionRef = useRef(new window.webkitSpeechRecognition());
    const audioElementRef = useRef<any>(null);
 
-   const [hasResponseError, setHasResponseError] = useState('');
+   const [hasResponseError, setHasResponseError] = useState<undefined | string>(
+      '',
+   );
    const [isLoadingResponse, setIsLoadingResponse] = useState(false);
    const [transcript, setTranscript] = useState('');
    const [latestMessage, setLatestMessage] = useState('');
@@ -78,6 +80,7 @@ export const ChatPage = () => {
             return response.json();
          })
          .then((data) => {
+            setHasResponseError(undefined);
             setLatestMessage(data.latestMessage);
             setHistory(data.history);
 
