@@ -4,6 +4,7 @@ import audioWaveGif from '../../assets/audio_wave.gif'; // adjust the path accor
 import { AppSwitchButton } from '../app-mode-switch';
 import { Input } from '../input';
 import { ChatBubbleFromAi, ChatBubbleFromMe } from './chat-bubble';
+import * as marked from 'marked';
 
 declare global {
    interface Window {
@@ -16,6 +17,10 @@ const onEnterKeyPressHandler = (e: React.KeyboardEvent<any>, cb: () => any) => {
       e.preventDefault();
       cb();
    }
+};
+
+const createMarkUp = (val: string) => {
+   return { __html: marked.parse(val) };
 };
 
 export const ChatPage = () => {
@@ -55,61 +60,64 @@ export const ChatPage = () => {
       sendTranscript(transcript);
    };
 
-   const sendTranscript = useCallback((transcript: string) => {
-      if (transcript.trim() === 'stop') {
-         audioElementRef.current?.stop();
-         return Promise.reject();
-      }
+   const sendTranscript = useCallback(
+      (transcript: string, bypassWakeWord?: boolean) => {
+         if (transcript.trim() === 'stop') {
+            audioElementRef.current?.stop();
+            return Promise.reject();
+         }
 
-      setTranscript(transcript);
+         setTranscript(transcript);
 
-      recognitionRef.current.stop();
-      setIsLoadingResponse(true);
+         recognitionRef.current.stop();
+         setIsLoadingResponse(true);
 
-      return fetch('/transcript', {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({ transcript: transcript }),
-      })
-         .then((response) => {
-            if (!response.ok) {
-               throw response;
-            }
-            return response.json();
+         return fetch('/transcript', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ transcript: transcript, bypassWakeWord }),
          })
-         .then((data) => {
-            setHasResponseError(undefined);
-            setLatestMessage(data.latestMessage);
-            setHistory(data.history);
+            .then((response) => {
+               if (!response.ok) {
+                  throw response;
+               }
+               return response.json();
+            })
+            .then((data) => {
+               setHasResponseError(undefined);
+               setLatestMessage(data.latestMessage);
+               setHistory(data.history);
 
-            setTimeout(() => {
-               audioElementRef.current.click();
-            }, 200);
+               setTimeout(() => {
+                  audioElementRef.current.click();
+               }, 200);
 
-            setTimeout(() => {
-               audioElementRef.current.src = data.filePath;
-               audioElementRef.current.play();
-            }, 500);
+               setTimeout(() => {
+                  audioElementRef.current.src = data.filePath;
+                  audioElementRef.current.play();
+               }, 500);
 
-            setTimeout(startTranscribing, 3000);
+               setTimeout(startTranscribing, 3000);
 
-            setIsLoadingResponse(false);
-         })
-         .catch((err) => {
-            console.warn(err);
-            setIsLoadingResponse(false);
-            setHasResponseError(
-               "I didn't quite get that. Try again, or with a wake word ...",
-            );
-         });
-   }, []);
+               setIsLoadingResponse(false);
+            })
+            .catch((err) => {
+               console.warn(err);
+               setIsLoadingResponse(false);
+               setHasResponseError(
+                  "I didn't quite get that. Try again, or with a wake word ...",
+               );
+            });
+      },
+      [],
+   );
 
    const onEnterClick = useCallback(() => {
       if (isLoadingResponse) return;
 
-      sendTranscript(input).then(() => setInput(''));
+      sendTranscript(input, true).then(() => setInput(''));
    }, [input, isLoadingResponse, sendTranscript]);
 
    useEffect(() => {
@@ -157,9 +165,12 @@ export const ChatPage = () => {
                         )}
 
                         {!isLoadingResponse && !hasResponseError && (
-                           <div className="text-slate-200 font-sembold text-lg mt-12 text-center">
-                              {latestMessage}
-                           </div>
+                           <div
+                              className="text-slate-200 font-sembold text-lg mt-12 text-center"
+                              dangerouslySetInnerHTML={createMarkUp(
+                                 latestMessage,
+                              )}
+                           />
                         )}
                      </>
                   )}

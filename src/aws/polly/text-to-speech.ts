@@ -52,8 +52,12 @@ export async function convertTextToSpeech(
 ): Promise<string> {
    const config = loadConfig();
 
+   console.warn(config);
+
    const polly = new Polly();
    const params = getPollyParams(config, options, text);
+
+   console.warn(params);
 
    const request = polly.synthesizeSpeech(params);
    const data = await request.promise();
