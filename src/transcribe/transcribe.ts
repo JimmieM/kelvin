@@ -3,7 +3,10 @@ import open from 'open';
 import { Configuration, OpenAIApi } from 'openai';
 import path from 'path';
 import { APP_PORT } from '../app-config/index.js';
-import { convertTextToSpeech } from '../aws/polly/text-to-speech.js';
+import {
+   convertTextToSpeech,
+   storeSpeech,
+} from '../aws/polly/text-to-speech.js';
 import { runChatCompletion } from '../chat-gpt/chat-completion.js';
 import { rootDirectory } from '../root/index.js';
 import { loadConfig } from '../user-config/user-config.js';
@@ -142,7 +145,8 @@ export const transcriptionInstance = async () => {
 
          const latestMessage = chatGptHistory[chatGptHistory.length - 1][1];
 
-         const textToMp3Filepath = await convertTextToSpeech(latestMessage, {});
+         const textToMp3 = await convertTextToSpeech(latestMessage, {});
+         const textToMp3Filepath = await storeSpeech(textToMp3, 'temp_sound');
 
          const timeoutMs = getActiveConversationMsByTranscriptionLength(text);
          setActiveConversation(timeoutMs);

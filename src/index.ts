@@ -10,6 +10,7 @@ import { configCommand } from './user-config/user-config.command.js';
 import path from 'path';
 import { rootDirectory } from './root/index.js';
 import { mkDir } from './fs-util/index.js';
+import { removeFilesInDirRecursive } from './transcribe/clean-unused-sound-files.js';
 
 async function main() {
    await program.parseAsync(process.argv);
@@ -24,8 +25,19 @@ const updateAwsConfig = (region?: string) => {
    });
 };
 
+const voiceSoundCleaner = () => {
+   const publicDirectory = path.join(rootDirectory, 'public', 'temp_sound');
+   const cleanupInterval = 60 * 60 * 1000; // 1 hour in milliseconds
+
+   setInterval(
+      () => removeFilesInDirRecursive(path.join(publicDirectory, 'temp_sound')),
+      cleanupInterval,
+   );
+};
+
 const setupOnBoot = async () => {
    updateAwsConfig();
+   voiceSoundCleaner();
 
    const publicDirectory = path.join(rootDirectory, 'public');
    await mkDir(publicDirectory);

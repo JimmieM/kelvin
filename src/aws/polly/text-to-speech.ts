@@ -46,18 +46,31 @@ const getPollyParams = (
    };
 };
 
+export const storeSpeech = async (
+   audioStream: Buffer,
+   dir: string,
+): Promise<string> => {
+   const filename = `output-${uuidv4()}.mp3`;
+   const publicDirectory = path.join(rootDirectory, 'public');
+   const filepath = path.join(publicDirectory, dir, filename);
+   const writeFile = util.promisify(fs.writeFile);
+   try {
+      await writeFile(filepath, audioStream);
+   } catch (error) {
+      console.warn(error);
+   }
+   console.log(`Audio content written to file: ${filename}`);
+   return filename;
+};
+
 export async function convertTextToSpeech(
    text: string,
    options: Partial<Options>,
-): Promise<string> {
+): Promise<pkg.Polly.AudioStream> {
    const config = loadConfig();
-
-   console.warn(config);
 
    const polly = new Polly();
    const params = getPollyParams(config, options, text);
-
-   console.warn(params);
 
    const request = polly.synthesizeSpeech(params);
    const data = await request.promise();
@@ -66,15 +79,5 @@ export async function convertTextToSpeech(
       throw new Error('Failed to synthesize speech.');
    }
 
-   const filename = `output-${uuidv4()}.mp3`;
-   const publicDirectory = path.join(rootDirectory, 'public');
-   const filepath = path.join(publicDirectory, filename);
-   const writeFile = util.promisify(fs.writeFile);
-   try {
-      await writeFile(filepath, data.AudioStream);
-   } catch (error) {
-      console.warn(error);
-   }
-   console.log(`Audio content written to file: ${filename}`);
-   return filename;
+   return data.AudioStream;
 }

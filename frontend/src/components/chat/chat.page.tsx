@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppMode } from '../../App';
 import audioWaveGif from '../../assets/audio_wave.gif'; // adjust the path according to your file structure
